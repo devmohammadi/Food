@@ -26,7 +26,6 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:scaleType="centerCrop"
-                android:src=""
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio="16:9"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -84,10 +83,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
+                app:layout_constraintBottom_toBottomOf="@+id/ivFavorite"
                 app:layout_constraintStart_toEndOf="@+id/tvFavorite"
+                app:layout_constraintTop_toTopOf="@+id/ivFavorite"
                 app:srcCompat="@drawable/baseline_time"
-                app:tint="@color/yellow"
-                tools:layout_editor_absoluteY="184dp" />
+                app:tint="@color/yellow" />
 
             <TextView
                 android:id="@+id/tvTime"
