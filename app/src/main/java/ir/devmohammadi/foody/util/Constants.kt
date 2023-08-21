@@ -1,4 +1,4 @@
-package ir.devmohammadi.foody
+package ir.devmohammadi.foody.util
 
 class Constants {
 
