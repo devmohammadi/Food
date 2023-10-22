@@ -1,6 +1,7 @@
 package ir.devmohammadi.foody.ui.fragments.home
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.todkars.shimmer.ShimmerRecyclerView
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,6 +18,7 @@ import ir.devmohammadi.foody.viewmodels.MainViewModel
 import ir.devmohammadi.foody.R
 import ir.devmohammadi.foody.adapter.RecipesAdapter
 import ir.devmohammadi.foody.databinding.FragmentHomeBinding
+import ir.devmohammadi.foody.util.Constants.Companion.DEFAULT_MEAL_TYPE
 import ir.devmohammadi.foody.util.NetworkResult
 import ir.devmohammadi.foody.util.observeOnce
 import ir.devmohammadi.foody.viewmodels.HomeViewModel
@@ -23,13 +27,14 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
+    private val args by navArgs<HomeFragmentArgs>()
+
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var homeViewModel: HomeViewModel
     private val mAdapter by lazy { RecipesAdapter() }
-    private lateinit var recyclerView: ShimmerRecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +54,10 @@ class HomeFragment : Fragment() {
         setupRecyclerView()
         readDatabase()
 
+        binding.recipesFab.setOnClickListener{
+            findNavController().navigate(R.id.action_homeFragment_to_recipesSheetFragment)
+        }
+
         return binding.root
     }
 
@@ -66,7 +75,7 @@ class HomeFragment : Fragment() {
     private fun readDatabase() {
         lifecycleScope.launch {
             mainViewModel.readRecipes.observeOnce(viewLifecycleOwner) { database ->
-                if (database.isNotEmpty()) {
+                if (database.isNotEmpty() && !args.backFromBottomSheet) {
                     mAdapter.setData(database[0].foodRecipe)
                     hideShimmerEffect()
                 } else {
