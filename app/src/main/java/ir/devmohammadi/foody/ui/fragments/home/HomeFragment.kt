@@ -19,11 +19,14 @@ import ir.devmohammadi.foody.R
 import ir.devmohammadi.foody.adapter.RecipesAdapter
 import ir.devmohammadi.foody.databinding.FragmentHomeBinding
 import ir.devmohammadi.foody.util.Constants.Companion.DEFAULT_MEAL_TYPE
+import ir.devmohammadi.foody.util.NetworkListener
 import ir.devmohammadi.foody.util.NetworkResult
 import ir.devmohammadi.foody.util.observeOnce
 import ir.devmohammadi.foody.viewmodels.HomeViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
@@ -35,6 +38,8 @@ class HomeFragment : Fragment() {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var homeViewModel: HomeViewModel
     private val mAdapter by lazy { RecipesAdapter() }
+
+    private lateinit var networkListener: NetworkListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,10 +57,28 @@ class HomeFragment : Fragment() {
         binding.mainViewModel = mainViewModel
 
         setupRecyclerView()
-        readDatabase()
+        homeViewModel.readBackOnline.observe(viewLifecycleOwner) {
+            homeViewModel.backOnline = it
+        }
 
-        binding.recipesFab.setOnClickListener{
-            findNavController().navigate(R.id.action_homeFragment_to_recipesSheetFragment)
+
+        lifecycleScope.launch {
+            networkListener = NetworkListener()
+            networkListener.checkNetworkAvailability(requireContext())
+                .collect { status ->
+                    Log.d("NetworkListener", status.toString())
+                    homeViewModel.networkStatus = status
+                    homeViewModel.showNetworkStatus()
+                    readDatabase()
+                }
+        }
+
+        binding.recipesFab.setOnClickListener {
+            if (homeViewModel.networkStatus) {
+                findNavController().navigate(R.id.action_homeFragment_to_recipesSheetFragment)
+            } else {
+                homeViewModel.showNetworkStatus()
+            }
         }
 
         return binding.root
