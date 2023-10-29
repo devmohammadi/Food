@@ -2,33 +2,34 @@ package ir.devmohammadi.foody.ui.fragments.home
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.todkars.shimmer.ShimmerRecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import ir.devmohammadi.foody.viewmodels.MainViewModel
 import ir.devmohammadi.foody.R
 import ir.devmohammadi.foody.adapter.RecipesAdapter
 import ir.devmohammadi.foody.databinding.FragmentHomeBinding
-import ir.devmohammadi.foody.util.Constants.Companion.DEFAULT_MEAL_TYPE
 import ir.devmohammadi.foody.util.NetworkListener
 import ir.devmohammadi.foody.util.NetworkResult
 import ir.devmohammadi.foody.util.observeOnce
 import ir.devmohammadi.foody.viewmodels.HomeViewModel
+import ir.devmohammadi.foody.viewmodels.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private val args by navArgs<HomeFragmentArgs>()
 
@@ -55,6 +56,8 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = this
         binding.mainViewModel = mainViewModel
+
+        setHasOptionsMenu(true)
 
         setupRecyclerView()
         homeViewModel.readBackOnline.observe(viewLifecycleOwner) {
@@ -93,6 +96,25 @@ class HomeFragment : Fragment() {
         binding.recyclerView.adapter = mAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         showShimmerEffect()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.recipes_menu, menu)
+        val search = menu.findItem(R.id.menu_search)
+        val searchView = search.actionView as? SearchView
+        searchView?.isSubmitButtonEnabled = true
+        searchView?.setOnQueryTextListener(this)
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        if (query != null) {
+            searchApiData(query)
+        }
+        return true
+    }
+
+    override fun onQueryTextChange(query: String?): Boolean {
+        return true
     }
 
     private fun readDatabase() {
@@ -144,6 +166,34 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun searchApiData(searchQuery: String) {
+        showShimmerEffect()
+        mainViewModel.searchRecipes(homeViewModel.applySearchQuery(searchQuery))
+        mainViewModel.searchRecipesResponse.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is NetworkResult.Success -> {
+                    hideShimmerEffect()
+                    val foodRecipe = response.data
+                    foodRecipe?.let { mAdapter.setData(it) }
+                }
+
+                is NetworkResult.Error -> {
+                    hideShimmerEffect()
+                    loadDataFromCache()
+                    Toast.makeText(
+                        requireContext(),
+                        response.message.toString(),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is NetworkResult.Loading -> {
+                    showShimmerEffect()
+                }
+            }
+        }
+    }
+
     private fun showShimmerEffect() {
         binding.recyclerView.showShimmer()
     }
@@ -151,4 +201,6 @@ class HomeFragment : Fragment() {
     private fun hideShimmerEffect() {
         binding.recyclerView.hideShimmer()
     }
+
+
 }
