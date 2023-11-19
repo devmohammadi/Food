@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="favoritesEntity"
+            type="ir.devmohammadi.foody.data.database.entities.FavoritesEntity" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/favoriteRowCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="@color/lightMediumGray"
+            app:strokeWidth="1dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/favoriteRecipesRowLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/ivRecipeFavorite"
+                    loadImageFromUrl="@{favoritesEntity.result.image}"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:scaleType="centerCrop"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="16:9"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                    android:id="@+id/viewFavorite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:alpha="0.5"
+                    android:background="@drawable/gradient"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvTitleFavorite"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginBottom="12dp"
+                    android:ellipsize="end"
+                    android:text="@{favoritesEntity.result.title}"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/ivFavoriteFavorite"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <ImageView
+                    android:id="@+id/ivFavoriteFavorite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginBottom="24dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/ivRecipeFavorite"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:srcCompat="@drawable/baseline_favorite"
+                    app:tint="@color/red" />
+
+                <TextView
+                    android:id="@+id/tvFavoriteFavorite"
+                    setNumberOfLikes="@{favoritesEntity.result.aggregateLikes}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/red"
+                    app:layout_constraintBottom_toBottomOf="@+id/ivFavoriteFavorite"
+                    app:layout_constraintStart_toEndOf="@+id/ivFavoriteFavorite"
+                    app:layout_constraintTop_toTopOf="@+id/ivFavoriteFavorite" />
+
+
+                <ImageView
+                    android:id="@+id/ivTimeFavorite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/ivFavoriteFavorite"
+                    app:layout_constraintStart_toEndOf="@+id/tvFavoriteFavorite"
+                    app:layout_constraintTop_toTopOf="@+id/ivFavoriteFavorite"
+                    app:srcCompat="@drawable/baseline_time"
+                    app:tint="@color/yellow" />
+
+                <TextView
+                    android:id="@+id/tvTimeFavorite"
+                    setNumberOfMinutes="@{favoritesEntity.result.readyInMinutes}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/yellow"
+                    app:layout_constraintBottom_toBottomOf="@+id/ivTimeFavorite"
+                    app:layout_constraintStart_toEndOf="@+id/ivTimeFavorite"
+                    app:layout_constraintTop_toTopOf="@+id/ivTimeFavorite" />
+
+                <ImageView
+                    android:id="@+id/ivVigenFavorite"
+                    applyVeganColor="@{favoritesEntity.result.vegan}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/ivTimeFavorite"
+                    app:layout_constraintStart_toEndOf="@+id/tvTimeFavorite"
+                    app:layout_constraintTop_toTopOf="@+id/ivTimeFavorite"
+                    app:srcCompat="@drawable/baseline_leaf"
+                    app:tint="@color/green" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
