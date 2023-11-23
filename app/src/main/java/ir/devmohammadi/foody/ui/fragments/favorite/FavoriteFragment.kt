@@ -24,8 +24,13 @@ import ir.devmohammadi.foody.viewmodels.MainViewModel
 @AndroidEntryPoint
 class FavoriteFragment : Fragment() {
 
-    private val mAdapter: FavoriteRecipesAdapter by lazy { FavoriteRecipesAdapter() }
     private val mainViewModel: MainViewModel by viewModels()
+    private val mAdapter: FavoriteRecipesAdapter by lazy {
+        FavoriteRecipesAdapter(
+            requireActivity(),
+            mainViewModel
+        )
+    }
 
     private var _binding: FragmentFavoriteBinding? = null
     private val binding get() = _binding!!
@@ -33,12 +38,27 @@ class FavoriteFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentFavoriteBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = this
         binding.mainViewModel = mainViewModel
         binding.mAdapter = mAdapter
+
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.favorite_recipes_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                if (menuItem.itemId == R.id.deleteAll_favorite_recipes_menu) {
+                    mainViewModel.deleteAllFavoriteRecipes()
+                    showSnackBar()
+                }
+                return true
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         setupRecyclerView(binding.favoriteRecipesRecyclerView)
 
@@ -50,8 +70,18 @@ class FavoriteFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    private fun showSnackBar() {
+        Snackbar.make(
+            binding.root,
+            "All recipes removed.",
+            Snackbar.LENGTH_SHORT
+        ).setAction("Okay") {}
+            .show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
         _binding = null
+        mAdapter.clearContextualActionMode()
     }
 }
