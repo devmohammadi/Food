@@ -2,6 +2,7 @@ package ir.devmohammadi.foody.data
 
 import ir.devmohammadi.foody.data.database.RecipesDao
 import ir.devmohammadi.foody.data.database.entities.FavoritesEntity
+import ir.devmohammadi.foody.data.database.entities.FoodJokeEntity
 import ir.devmohammadi.foody.data.database.entities.RecipesEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -31,5 +32,13 @@ class LocalDataSource @Inject constructor(
 
     suspend fun deleteAllFavoriteRecipes() {
         recipesDao.deleteAllFavoriteRecipe()
+    }
+
+    fun insertFoodJoke(foodJokeEntity: FoodJokeEntity) {
+        recipesDao.insertFoodJoke(foodJokeEntity)
+    }
+
+    fun readFoodJoke(): Flow<List<FoodJokeEntity>> {
+        return recipesDao.readFoodJoke()
     }
 }
