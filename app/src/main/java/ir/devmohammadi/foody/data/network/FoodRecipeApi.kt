@@ -23,4 +23,5 @@ interface FoodRecipeApi {
     suspend fun getFoodJoke(
         @Query("apiKey") apiKey: String
     ): Response<FoodJoke>
+
 }
